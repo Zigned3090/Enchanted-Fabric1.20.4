@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "enchanted",
+	"version": "${version}",
+	"name": "Enchanted",
+	"description": "Add some enchantments for mob",
+	"authors": [
+		"Z1gned!"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": ""
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/enchanted/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"mc.z1gned.enchanted.ModMain"
+		],
+		"client": [
+			"mc.z1gned.enchanted.ModClient"
+		]
+	},
+	"mixins": [
+		"enchanted.mixins.json",
+		{
+			"config": "enchanted.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.3",
+		"minecraft": "~1.20.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

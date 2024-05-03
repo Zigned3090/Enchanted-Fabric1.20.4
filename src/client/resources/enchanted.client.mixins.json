@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "mc.z1gned.enchanted.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "EnderDragonEntityRendererMixin",
+    "LivingEntityRendererMixin",
+    "ProjectileEntityRendererMixin",
+    "WitherSkullEntityRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}
