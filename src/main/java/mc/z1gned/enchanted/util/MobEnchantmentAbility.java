@@ -108,12 +108,16 @@ public class MobEnchantmentAbility {
 
     }
 
+    public MobEnchantmentAbility copy() {
+        MobEnchantmentAbility ability = new MobEnchantmentAbility();
+        ability.mobEnchants = this.mobEnchants;
+        ability.enchantOwner = this.enchantOwner;
+        ability.enchantType = this.enchantType;
+        return ability;
+    }
+
     public final void sync(LivingEntity entity) {
-        MobEnchantmentAbility capability = new MobEnchantmentAbility();
-        capability.mobEnchants = this.mobEnchants;
-        capability.enchantOwner = this.enchantOwner;
-        capability.enchantType = this.enchantType;
-        ((MobEnchantInterface) entity).setEnchantAbility(capability);
+        ((MobEnchantInterface) entity).setEnchantAbility(copy());
     }
 
     public List<MobEnchantmentHandler> getMobEnchants() {
@@ -148,8 +152,8 @@ public class MobEnchantmentAbility {
         NbtCompound nbt = new NbtCompound();
         NbtList listNbt = new NbtList();
 
-        for(int i = 0; i < this.mobEnchants.size(); ++i) {
-            listNbt.add((this.mobEnchants.get(i)).writeNBT());
+        for (MobEnchantmentHandler mobEnchant : this.mobEnchants) {
+            listNbt.add(mobEnchant.writeNBT());
         }
 
         nbt.put(MobEnchantmentUtil.STORED_MOB_ENCHANTS, listNbt);
@@ -157,19 +161,20 @@ public class MobEnchantmentAbility {
         return nbt;
     }
 
-    public void deserializeNBT(NbtCompound nbt) {
+    public static MobEnchantmentAbility deserializeNBT(NbtCompound nbt) {
+        MobEnchantmentAbility ability = new MobEnchantmentAbility();
         NbtList list = MobEnchantmentUtil.getEnchantmentListForNBT(nbt);
-        this.mobEnchants.clear();
+        ability.mobEnchants.clear();
 
         for(int i = 0; i < list.size(); ++i) {
             NbtCompound nbtCompound = list.getCompound(i);
             MobEnchant mobEnchant = MobEnchantmentUtil.getEnchantFromNBT(nbtCompound);
-            if (mobEnchant != null) {
-                this.mobEnchants.add(new MobEnchantmentHandler(mobEnchant, MobEnchantmentUtil.getEnchantLevelFromNBT(nbtCompound)));
-            }
+            if (mobEnchant != null)
+                ability.mobEnchants.add(new MobEnchantmentHandler(mobEnchant, MobEnchantmentUtil.getEnchantLevelFromNBT(nbtCompound)));
         }
 
-        this.fromOwner = nbt.getBoolean("FromOwner");
+        ability.fromOwner = nbt.getBoolean("FromOwner");
+        return ability;
     }
 
     static {

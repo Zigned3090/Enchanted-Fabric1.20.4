@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(WitherSkullEntityRenderer.class)
 public class WitherSkullEntityRendererMixin {
-
     @Shadow @Final private SkullEntityModel model;
 
     @Inject(at = @At("TAIL"), method = "render(Lnet/minecraft/entity/projectile/WitherSkullEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V")

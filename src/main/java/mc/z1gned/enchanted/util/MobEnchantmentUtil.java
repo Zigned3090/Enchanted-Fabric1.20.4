@@ -53,22 +53,19 @@ public class MobEnchantmentUtil {
     }
 
     public static Map<MobEnchant, Integer> getEnchantments(ItemStack stack) {
-        NbtList nbtList = getEnchantmentListForNBT(stack.getNbt());
-        return makeMobEnchantListFromListNBT(nbtList);
+        return makeMobEnchantListFromListNBT(getEnchantmentListForNBT(stack.getNbt()));
     }
 
     public static void setEnchantments(Map<MobEnchant, Integer> enchMap, ItemStack stack) {
         NbtList listnbt = new NbtList();
-        Iterator var3 = enchMap.entrySet().iterator();
 
-        while(var3.hasNext()) {
-            Map.Entry<MobEnchant, Integer> entry = (Map.Entry)var3.next();
-            MobEnchant enchantment = entry.getKey();
+        for (Map.Entry<MobEnchant, Integer> mobEnchantIntegerEntry : enchMap.entrySet()) {
+            MobEnchant enchantment = mobEnchantIntegerEntry.getKey();
             if (enchantment != null) {
-                int i = entry.getValue();
+                int i = mobEnchantIntegerEntry.getValue();
                 NbtCompound compoundnbt = new NbtCompound();
                 compoundnbt.putString(MOB_ENCHANTMENTS, String.valueOf(ModRegistries.MOB_ENCHANT.getId(enchantment)));
-                compoundnbt.putShort(LVL, (short)i);
+                compoundnbt.putShort(LVL, (short) i);
                 listnbt.add(compoundnbt);
                 if (stack.getItem() == ModItems.ENCHANT_EMERALD) {
                     addMobEnchantToItemStack(stack, enchantment, i);
