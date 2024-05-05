@@ -10,12 +10,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,14 +23,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements MobEnchantInterface {
     @Unique
-    private static final TrackedData<MobEnchantmentAbility> MOB_ENCHANTMENT_ABILITY;
+    @SuppressWarnings("WrongEntityDataParameterClass")
+    private static final TrackedData<MobEnchantmentAbility> MOB_ENCHANTMENT_ABILITY_DATA = DataTracker.registerData(LivingEntity.class, ModTrackedData.MOB_ENCHANTMENT_ABILITY);
+    @Unique
+    private static final String MOB_ENCHANTMENT_ABILITY_KEY = "MobEnchantmentData";
 
-
-    @Shadow public abstract boolean damage(DamageSource source, float amount);
-
-
-    public LivingEntityMixin(EntityType<?> type, World world) {
+    private LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
+        throw new IllegalStateException("This class must not be instantiated");
+    }
+
+    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
+    private void readNbt(NbtCompound nbt, CallbackInfo info) {
+        setEnchantAbility(MobEnchantmentAbility.deserializeNBT(nbt.getCompound(MOB_ENCHANTMENT_ABILITY_KEY)));
+    }
+
+    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
+    private void writeNbt(NbtCompound nbt, CallbackInfo info) {
+        nbt.put(MOB_ENCHANTMENT_ABILITY_KEY, getEnchantAbility().serializeNBT());
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
@@ -43,38 +51,18 @@ public abstract class LivingEntityMixin extends Entity implements MobEnchantInte
                 livingEntity = (LivingEntity) (Object) this;
                 this.getEnchantAbility().removeMobEnchantFromOwner(livingEntity);
                 this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 1.5F, 1.6F);
-            } else if (this.squaredDistanceTo(this.getEnchantAbility().getEnchantOwner().get()) > 512.0) {
+            }
+            else if (this.squaredDistanceTo(this.getEnchantAbility().getEnchantOwner().get()) > 512.0) {
                 livingEntity = (LivingEntity) (Object) this;
                 this.getEnchantAbility().removeMobEnchantFromOwner(livingEntity);
                 this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 1.5F, 1.6F);
             }
         }
-
-        if ((LivingEntity) (Object) this instanceof PlayerEntity player) {
-            if (player.getWorld().isClient) {
-                if (player instanceof MobEnchantInterface ability) {
-                    System.out.println(ability.getEnchantAbility().hasEnchant());
-                }
-            }
-        }
-
     }
 
     @Inject(method = "initDataTracker", at = @At("TAIL"))
-    private void defineSynchedData(CallbackInfo callbackInfo) {
-        this.dataTracker.startTracking(MOB_ENCHANTMENT_ABILITY, new MobEnchantmentAbility());
-    }
-
-    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
-    private void addAdditionalSaveData(NbtCompound nbt, CallbackInfo ci) {
-        nbt.put("MobEnchantmentData", this.getEnchantAbility().serializeNBT());
-    }
-
-    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
-    private void readAdditionalSaveData(NbtCompound nbt, CallbackInfo ci) {
-        MobEnchantmentAbility mobEnchantmentAbility = new MobEnchantmentAbility();
-        mobEnchantmentAbility.deserializeNBT(nbt.getCompound("MobEnchantmentData"));
-        this.getEnchantAbility().deserializeNBT(nbt.getCompound("MobEnchantmentData"));
+    private void defineSyncData(CallbackInfo callbackInfo) {
+        this.dataTracker.startTracking(MOB_ENCHANTMENT_ABILITY_DATA, new MobEnchantmentAbility());
     }
 
     @Inject(method = "modifyAppliedDamage", at = @At("RETURN"), cancellable = true)
@@ -84,18 +72,15 @@ public abstract class LivingEntityMixin extends Entity implements MobEnchantInte
     }
 
     @Override
+    @SuppressWarnings("AddedMixinMembersNamePattern")
     public MobEnchantmentAbility getEnchantAbility() {
-        return this.dataTracker.get(MOB_ENCHANTMENT_ABILITY);
+        return this.dataTracker.get(MOB_ENCHANTMENT_ABILITY_DATA);
     }
 
     @Override
+    @SuppressWarnings("AddedMixinMembersNamePattern")
     public void setEnchantAbility(MobEnchantmentAbility ability) {
-        this.dataTracker.set(MOB_ENCHANTMENT_ABILITY, ability);
+        this.dataTracker.set(MOB_ENCHANTMENT_ABILITY_DATA, ability);
     }
-
-    static {
-        MOB_ENCHANTMENT_ABILITY = DataTracker.registerData(LivingEntity.class, ModTrackedData.MOB_ENCHANTMENT_ABILITY);
-    }
-
 }
 

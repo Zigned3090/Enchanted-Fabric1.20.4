@@ -8,23 +8,20 @@ import net.minecraft.network.PacketByteBuf;
 public class ModTrackedData {
 
     public static final TrackedDataHandler<MobEnchantmentAbility> MOB_ENCHANTMENT_ABILITY = new TrackedDataHandler<>() {
-        public void write(PacketByteBuf packetByteBuf, MobEnchantmentAbility nbtCompound) {
-            packetByteBuf.writeNbt(nbtCompound.serializeNBT());
+        public void write(PacketByteBuf buf, MobEnchantmentAbility ability) {
+            buf.writeNbt(ability.serializeNBT());
         }
 
-        public MobEnchantmentAbility read(PacketByteBuf packetByteBuf) {
-            MobEnchantmentAbility mobEnchantmentAbility = new MobEnchantmentAbility();
-            mobEnchantmentAbility.deserializeNBT(packetByteBuf.readNbt());
-            return mobEnchantmentAbility;
+        public MobEnchantmentAbility read(PacketByteBuf buf) {
+            return MobEnchantmentAbility.deserializeNBT(buf.readNbt());
         }
 
-        public MobEnchantmentAbility copy(MobEnchantmentAbility mobEnchantmentAbility) {
-            return mobEnchantmentAbility;
+        public MobEnchantmentAbility copy(MobEnchantmentAbility ability) {
+            return ability.copy();
         }
     };
 
     public static void registerDataTrackers() {
         TrackedDataHandlerRegistry.register(MOB_ENCHANTMENT_ABILITY);
     }
-
 }
