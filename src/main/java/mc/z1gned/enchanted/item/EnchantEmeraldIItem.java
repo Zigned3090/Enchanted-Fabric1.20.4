@@ -26,11 +26,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+//附魔物品
 public class EnchantEmeraldIItem extends Item {
+    //构造函数
     public EnchantEmeraldIItem(Settings settings) {
         super(settings);
     }
-
+    //
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
         if (MobEnchantmentUtil.hasMobEnchant(stack)) {
