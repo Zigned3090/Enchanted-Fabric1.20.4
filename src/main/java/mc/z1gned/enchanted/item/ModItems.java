@@ -8,6 +8,7 @@ import net.minecraft.util.Identifier;
 
 import static mc.z1gned.enchanted.ModMain.MOD_ID;
 
+//正常的物品类
 public class ModItems {
 
     public static final Item ENCHANT_EMERALD = new EnchantEmeraldIItem(new FabricItemSettings());

@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import static mc.z1gned.enchanted.ModMain.MOD_ID;
 
+//正常的ItemGroup类
 public class ModItemGroup {
     private static final List<ItemStack> GENERAL_ITEM = Stream.of(ModItems.ENCHANT_EMERALD).map(ItemStack::new).toList();
 
@@ -24,7 +25,7 @@ public class ModItemGroup {
                 entries.addAll(GENERAL_ITEM);
                 EnchantEmeraldIItem.generateMobEnchantmentBookTypesOnlyMaxLevel(entries, ItemGroup.StackVisibility.PARENT_TAB_ONLY);
             }).build());
-
+//空的方法，是个占位符
     public static void registerItemGroup() {}
 
 }
